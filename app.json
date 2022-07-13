@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Math",
+    "slug": "Math",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "Math"
+}
