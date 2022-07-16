@@ -9,54 +9,90 @@ import {
   View,
 } from 'react-native'
 
-const Question = () => {
-  const [answer, changeAnswer] = React.useState('');
+function choice(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
 
-  const randomInt = (x, y) => {
-    return x + Math.floor((y-x+1)*Math.random());
+const randomInt = (x, y) => {
+  return x + Math.floor((y-x+1)*Math.random());
+}
+
+class Question extends Component {
+  constructor(props) {
+    super(props);
+    this.state = this.generate();
+    this.state = {...this.state, 'guess':'', 'streak':0};
   }
 
-  const [correct, setcorrect] = React.useState(0);
-  const [a, seta] = React.useState(randomInt(10, 50));
-  const [b, setb] = React.useState(randomInt(10, 50));
-
-  const submitAnswer = () => {
-    let localCorrect = 0;
-    if ((a+b).toString() == answer) {
-      localCorrect = correct+1;
-      setcorrect(correct+1);
-    } else {
-      setcorrect(0);
+  changeGuess = (guess) => {
+    if (parseFloat(guess)!= NaN) {
+      this.setState({'guess': guess});
     }
-    seta(randomInt(10, 50*(localCorrect+1)));
-    setb(randomInt(10, 50*(localCorrect+1)));
-    changeAnswer('');
   }
 
+  submitGuess = () => {
+    let newStreak = this.state.streak;
+    if (this.state.guess == this.state.answer.toString()) {
+      newStreak++;
+    } else {
+      newStreak = 0;
+    }
+    this.setState({...this.generate(newStreak+1), 'guess':'', 'streak': newStreak});
+  }
 
-  return (
-    <View>
-      <Text style={styles.bigCenter}>
-        {a} + {b}
-      </Text>
-      <TextInput
-        style={styles.bigCenter}
-        onChangeText={changeAnswer}
-        value={answer}
-        placeholder="Answer"
-        keyboardType="numeric"
-      />
-      <Button
-        onPress={submitAnswer}
-        title="Submit"
-        color="#841584"
-      />
-      <Text style={styles.bigCenter}>
-        Streak: {correct}
-      </Text>
-    </View>
-  );
-};
+  generate(level=1, options=['addition', 'subtraction', 'multiplication', 'division']) {
+    const type = choice(options);
+    let question = '0+0';
+    let answer = 0;
+    if (type == 'addition') {
+      const x = randomInt(level, 5*level);
+      const y = randomInt(level, 5*level);
+      question = x.toString() + '+' + y.toString();
+      answer = x + y
+    } else if (type == 'subtraction') {
+      const x = randomInt(level, 5*level);
+      const y = randomInt(level, 5*level);
+      question = Math.max(x, y).toString() + '-' + Math.min(x, y).toString();
+      answer = Math.abs(x - y);
+    } else if (type == 'multiplication') {
+      const x = randomInt(2, 5+3*level);
+      const y = randomInt(2, 5+3*level);
+      question = x.toString() + '*' + y.toString();
+      answer = x * y;
+    } else if (type == 'division') {
+      const x = randomInt(2, 5+3*level);
+      answer = randomInt(2, 5+3*level);
+      question = (x*answer).toString() + '/' + x.toString();
+    }
+    return {'question': question, 'answer': answer}
+  }
+
+  render() {
+    return (
+      <View>
+        <Text style={styles.bigCenter}>
+          {this.state.question}
+        </Text>
+        <TextInput
+          style={styles.bigCenter}
+          onChangeText={this.changeGuess}
+          value={this.state.guess}
+          placeholder="Answer"
+          keyboardType="numeric"
+        />
+        <Button
+          onPress={this.submitGuess}
+          title="Submit"
+          color="#841584"
+        />
+        <Text style={styles.bigCenter}>
+          Streak: {this.state.streak}
+        </Text>
+      </View>
+    )
+  }
+}
 
 export default function App() {
   return (
