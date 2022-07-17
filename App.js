@@ -32,7 +32,7 @@ class Question extends Component {
   }
 
   submitGuess = () => {
-    if (this.state.guess != '')
+    if (this.state.guess != '') // Prevent blank guesses
     {
       let newStreak = this.state.streak;
       if (this.state.guess == this.state.answer.toString()) {
