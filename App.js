@@ -32,13 +32,16 @@ class Question extends Component {
   }
 
   submitGuess = () => {
-    let newStreak = this.state.streak;
-    if (this.state.guess == this.state.answer.toString()) {
-      newStreak++;
-    } else {
-      newStreak = 0;
+    if (this.state.guess != '')
+    {
+      let newStreak = this.state.streak;
+      if (this.state.guess == this.state.answer.toString()) {
+        newStreak++;
+      } else {
+        newStreak = 0;
+      }
+      this.setState({...this.generate(newStreak+1), 'guess':'', 'streak': newStreak});
     }
-    this.setState({...this.generate(newStreak+1), 'guess':'', 'streak': newStreak});
   }
 
   generate(level=1, options=['addition', 'subtraction', 'multiplication', 'division']) {
