@@ -139,8 +139,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bigCenter: {
-    fontSize: 48,
+    fontSize: '6vw',
     fontWeight: 'bold',
+    padding: '3vw',
     textAlign: 'center',
   }
 });
