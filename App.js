@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import {
   Button,
+  CheckBox,
   StyleSheet,
-  TouchableOpacity,
   Text,
   TextInput,
   View,
@@ -22,11 +22,15 @@ class Question extends Component {
   constructor(props) {
     super(props);
     this.state = this.generate();
-    this.state = {...this.state, 'guess':'', 'streak':0};
+    this.state = {...this.state,
+      'guess':'',
+      'streak':0,
+      'problemTypes': {'addition': true, 'subtraction': true, 'multiplication': true, 'division': true, 'rounding': true},
+      };
   }
 
   changeGuess = (guess) => {
-    if (parseFloat(guess)!= NaN) {
+    if (!isNaN(guess)) {
       this.setState({'guess': guess});
     }
   }
@@ -40,13 +44,29 @@ class Question extends Component {
       } else {
         newStreak = 0;
       }
-      this.setState({...this.generate(newStreak+1), 'guess':'', 'streak': newStreak});
+      this.setState({...this.generate(newStreak+1, this.getSelectedProblems()), 'guess':'', 'streak': newStreak});
     }
+  }
+
+  updateCheckbox(problemType, value) {
+    var updatedProblemTypes = this.state.problemTypes;
+    updatedProblemTypes[problemType] = value;
+    this.setState({'problemTypes': updatedProblemTypes});
+  }
+
+  getSelectedProblems() {
+    var selected = [];
+    for (var problemType in this.state.problemTypes) {
+      if (this.state.problemTypes[problemType]) {
+        selected.push(problemType);
+      }
+    }
+    return selected;
   }
 
   generate(level=1, options=['addition', 'subtraction', 'multiplication', 'division', 'rounding']) {
     const type = choice(options);
-    let question = '0+0';
+    let question = '0';
     let answer = 0;
     if (type == 'addition') {
       const x = randomInt(level, 5*level);
@@ -99,6 +119,20 @@ class Question extends Component {
   render() {
     return (
       <View>
+        {
+          Object.keys(this.state.problemTypes).map(problemType =>
+          <View style = {{flexDirection:"row", flexWrap:"wrap"}}>
+            <CheckBox
+              key = {problemType}
+              value={this.state.problemTypes[problemType]}
+              onValueChange={(updatedValue) => this.updateCheckbox(problemType, updatedValue)}
+            />
+            <Text>
+              {problemType}
+            </Text>
+          </View>
+          )
+        }
         <Text style={styles.bigCenter}>
           {this.state.question}
         </Text>
