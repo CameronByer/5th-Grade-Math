@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react'
 import {
   Button,
   CheckBox,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -25,7 +26,7 @@ class Question extends Component {
     this.state = {...this.state,
       'guess':'',
       'streak':0,
-      'problemTypes': {'addition': true, 'subtraction': true, 'multiplication': true, 'division': true, 'rounding': true},
+      'problemTypes': {'Addition': true, 'Subtraction': true, 'Multiplication': true, 'Division': true, 'Rounding': true},
       };
   }
 
@@ -64,8 +65,8 @@ class Question extends Component {
     return selected;
   }
 
-  generate(level=1, options=['addition', 'subtraction', 'multiplication', 'division', 'rounding']) {
-    const type = choice(options);
+  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding']) {
+    const type = choice(options).toLowerCase();
     let question = '0';
     let answer = 0;
     if (type == 'addition') {
@@ -118,21 +119,23 @@ class Question extends Component {
 
   render() {
     return (
-      <View>
+      <Fragment>
+        <View style = {{flexDirection:"row", flexWrap:"wrap"}}>
         {
           Object.keys(this.state.problemTypes).map(problemType =>
-          <View style = {{flexDirection:"row", flexWrap:"wrap"}}>
-            <CheckBox
-              key = {problemType}
-              value={this.state.problemTypes[problemType]}
-              onValueChange={(updatedValue) => this.updateCheckbox(problemType, updatedValue)}
-            />
-            <Text>
-              {problemType}
-            </Text>
-          </View>
+            <Pressable
+                key={problemType}
+                onPress={() => this.updateCheckbox(problemType, !this.state.problemTypes[problemType])} 
+              >
+              <Text style={styles.toggleable}>
+                <Text style={{color: this.state.problemTypes[problemType] ? 'green':'red'}}>
+                  {problemType}
+                </Text>
+              </Text>
+            </Pressable>
           )
         }
+        </View>
         <Text style={styles.bigCenter}>
           {this.state.question}
         </Text>
@@ -143,15 +146,15 @@ class Question extends Component {
           placeholder="Answer"
           keyboardType="numeric"
         />
-        <Button
-          onPress={this.submitGuess}
-          title="Submit"
-          color="#841584"
-        />
+        <Pressable style={styles.submitContainer} onPress={this.submitGuess}>
+          <Text style={styles.submit}>
+            Submit
+          </Text>
+        </Pressable>
         <Text style={styles.bigCenter}>
           Streak: {this.state.streak}
         </Text>
-      </View>
+      </Fragment>
     )
   }
 }
@@ -176,6 +179,22 @@ const styles = StyleSheet.create({
     fontSize: '4vw',
     fontWeight: 'bold',
     padding: '2vw',
+    textAlign: 'center',
+  },
+  submit: {
+    fontSize: '3vw',
+    color: 'white',
+  },
+  submitContainer: {
+    backgroundColor: 'purple',
+    borderRadius: '1vw',
+    paddingHorizontal: '3vw',
+    paddingVertical: '0.5vw'
+  },
+  toggleable: {
+    fontSize: '1.5vw',
+    fontWeight: 'bold',
+    padding: '.5vw',
     textAlign: 'center',
   }
 });
