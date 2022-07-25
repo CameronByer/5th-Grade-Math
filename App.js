@@ -42,10 +42,11 @@ class Question extends Component {
       let newStreak = this.state.streak;
       if (this.state.guess == this.state.answer.toString()) {
         newStreak++;
+        this.setState({...this.generate(newStreak+1, this.getSelectedProblems()), 'guess':''});
       } else {
         newStreak = 0;
       }
-      this.setState({...this.generate(newStreak+1, this.getSelectedProblems()), 'guess':'', 'streak': newStreak});
+      this.setState({'streak': newStreak});
     }
   }
 
@@ -65,13 +66,19 @@ class Question extends Component {
     return selected;
   }
 
-  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding']) {
+  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding'], modifiers=["Decimals"]) {
     const type = choice(options).toLowerCase();
     let question = '0';
     let answer = 0;
     if (type == 'addition') {
-      const x = randomInt(level, 5*level);
-      const y = randomInt(level, 5*level);
+      let x = randomInt(level, 5*level);
+      let y = randomInt(level, 5*level);
+      if (modifiers.includes("Decimals")) {
+        const maxDigits = Math.floor(Math.log10(Math.max(x, y)))+1;
+        const shift = randomInt(0, maxDigits);
+        x /= 10**shift;
+        y /= 10**shift;
+      }
       question = x.toString() + '+' + y.toString();
       answer = x + y
     } else if (type == 'subtraction') {
