@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, Fragment } from 'react'
 import {
-  Button,
-  CheckBox,
   Pressable,
   StyleSheet,
   Text,
@@ -73,14 +71,14 @@ class Question extends Component {
     if (type == 'addition') {
       let x = randomInt(level, 5*level);
       let y = randomInt(level, 5*level);
+      let shift = 0;
       if (modifiers.includes("Decimals")) {
         const maxDigits = Math.floor(Math.log10(Math.max(x, y)))+1;
-        const shift = randomInt(0, maxDigits);
-        x /= 10**shift;
-        y /= 10**shift;
+        shift = randomInt(0, maxDigits);
       }
-      question = x.toString() + '+' + y.toString();
-      answer = x + y
+      question = (x/10**shift).toString() + '+' + (y/10**shift).toString();
+      answer = (x + y)/10**shift;
+      console.log(answer);
     } else if (type == 'subtraction') {
       const x = randomInt(level, 5*level);
       const y = randomInt(level, 5*level);
