@@ -28,6 +28,14 @@ class Question extends Component {
       };
   }
 
+  componentDidMount() {
+    document.addEventListener("keydown", this.keyHandler, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.keyHandler, false);
+  }
+
   changeGuess = (guess) => {
     if (!isNaN(guess)) {
       this.setState({'guess': guess});
@@ -122,6 +130,26 @@ class Question extends Component {
     return {'question': question, 'answer': answer}
   }
 
+  keyHandler = (e) => {
+    console.log(e);
+    if (e.nativeEvent.key === 'Enter') {
+      this.submitGuess();
+    }
+    if (e.nativeEvent.key === 'Backspace') {
+      this.changeGuess(this.state.guess.slice(0, -1));
+    }
+    if ('.0123456789'.includes(e.nativeEvent.key)) {
+      this.changeGuess(this.state.guess + e.nativeEvent.key);
+    }
+  };
+
+  checkSubmit = (e) => {
+    console.log(e);
+    if (e.nativeEvent.key === 'Enter') {
+      this.submitGuess();
+    }
+  };
+
   render() {
     return (
       <Fragment>
@@ -147,6 +175,7 @@ class Question extends Component {
         <TextInput
           style={styles.bigCenter}
           onChangeText={this.changeGuess}
+          onKeyPress={this.checkSubmit}
           value={this.state.guess}
           placeholder="Answer"
           keyboardType="numeric"
@@ -172,6 +201,11 @@ export default function App() {
     </View>
   );
 }
+
+
+document.addEventListener('keydown', function(event){
+  console.log(`Key: ${event.key} with keycode ${event.keyCode} has been pressed`);
+});
 
 const styles = StyleSheet.create({
   container: {
