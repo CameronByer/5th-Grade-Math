@@ -17,14 +17,21 @@ const randomInt = (x, y) => {
   return x + Math.floor((y-x+1)*Math.random());
 }
 
+const greatestFactor = (x, y) => {
+  if (x*y == 0) {
+    return x+y
+  }
+  return greatestFactor(y, Math.abs(x-y));
+}
+
 class Question extends Component {
   constructor(props) {
     super(props);
-    this.state = this.generate();
+    this.state = this.generate(1, ['GCF']);
     this.state = {...this.state,
       'guess':'',
       'streak':0,
-      'problemTypes': {'Addition': true, 'Subtraction': true, 'Multiplication': true, 'Division': true, 'Rounding': true},
+      'problemTypes': {'Addition': false, 'Subtraction': false, 'Multiplication': false, 'Division': false, 'Rounding': false, 'GCF': true},
       };
   }
 
@@ -72,7 +79,7 @@ class Question extends Component {
     return selected;
   }
 
-  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding'], modifiers=["Decimals"]) {
+  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding', 'GCF'], modifiers=["Decimals"]) {
     const type = choice(options).toLowerCase();
     let question = '0';
     let answer = 0;
@@ -126,6 +133,26 @@ class Question extends Component {
       if (place >= 0) {
         answer = Math.round(answer)
       }
+    } else if (type == 'gcf') {
+      let baseMultiple = randomInt(1, level+3);
+      let multiples = randomInt(2, level<10 ? 2 : 3);
+      let numMax = 5*level;
+      let nums = [];
+      let maxMultiple = numMax/baseMultiple;
+      for (let i=0; i<multiples; i++) {
+        nums.push(baseMultiple*randomInt(1, maxMultiple))
+      }
+      question = "GCF of the terms: " + nums.join(", ");
+      while (nums.length > 1) {
+        console.log(nums.length);
+        console.log(nums);
+        nums[1] = greatestFactor(nums[0], nums[1]);
+        console.log(nums);
+        nums = nums.slice(1);
+        console.log(nums);
+        console.log('XXX');
+      }
+      answer = nums[0];
     }
     return {'question': question, 'answer': answer}
   }
@@ -201,11 +228,6 @@ export default function App() {
     </View>
   );
 }
-
-
-document.addEventListener('keydown', function(event){
-  console.log(`Key: ${event.key} with keycode ${event.keyCode} has been pressed`);
-});
 
 const styles = StyleSheet.create({
   container: {
