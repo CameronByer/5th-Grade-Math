@@ -27,11 +27,11 @@ const greatestFactor = (x, y) => {
 class Question extends Component {
   constructor(props) {
     super(props);
-    this.state = this.generate(1, ['GCF']);
+    this.state = this.generate(1, ['Unit 3']);
     this.state = {...this.state,
       'guess':'',
       'streak':0,
-      'problemTypes': {'Addition': false, 'Subtraction': false, 'Multiplication': false, 'Division': false, 'Rounding': false, 'GCF': true},
+      'problemTypes': {'Addition': true, 'Subtraction': true, 'Multiplication': true, 'Division': true, 'Rounding': true, 'GCF': true, 'Unit 3': true},
       };
   }
 
@@ -44,9 +44,7 @@ class Question extends Component {
   }
 
   changeGuess = (guess) => {
-    if (!isNaN(guess)) {
-      this.setState({'guess': guess});
-    }
+    this.setState({'guess': guess});
   }
 
   submitGuess = () => {
@@ -79,10 +77,16 @@ class Question extends Component {
     return selected;
   }
 
-  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding', 'GCF'], modifiers=["Decimals"]) {
+  generate(level=1, options=['Addition', 'Subtraction', 'Multiplication', 'Division', 'Rounding', 'GCF', 'Unit 3'], modifiers=["Decimals"]) {
+    if (options.includes("Unit 3")) {
+      options.push("complex add");
+      options.push("complex sub");
+      options.push("complex mult");
+      //options.push("factor a=1");
+    }
     const type = choice(options).toLowerCase();
     let question = '0';
-    let answer = 0;
+    let answer = '0';
     if (type == 'addition') {
       let x = randomInt(level, 5*level);
       let y = randomInt(level, 5*level);
@@ -153,19 +157,95 @@ class Question extends Component {
         console.log('XXX');
       }
       answer = nums[0];
+    } else if (type == 'complex add') {
+      let a=0;
+      let b=0;
+      let c=0;
+      let d=0;
+      while(a*b*c*d==0) {
+        a = randomInt(-(level+5), level+5);
+        b = randomInt(-(level+5), level+5);
+        c = randomInt(-(level+5), level+5);
+        d = randomInt(-(level+5), level+5);
+      }
+      question = "("+a.toString()+(b>=0?"+":"")+(b==1?"":b.toString())+"i)+"+"("+c.toString()+(d>=0?"+":"")+d.toString()+"i)";
+      let realpart = a+c;
+      let imagpart = b+d;
+      if (realpart == 0) {
+        answer = imagpart.toString()+"i";
+      } else if (imagpart == 0) {
+        answer = realpart.toString();
+      } else {
+        answer = realpart.toString()+(imagpart>0?"+":"")+imagpart.toString()+"i";
+      }
+      console.log(answer);
+    } else if (type == 'complex sub') {
+      let a=0;
+      let b=0;
+      let c=0;
+      let d=0;
+      while(a*b*c*d==0) {
+        a = randomInt(-(level+5), level+5);
+        b = randomInt(-(level+5), level+5);
+        c = randomInt(-(level+5), level+5);
+        d = randomInt(-(level+5), level+5);
+      }
+      question = "("+a.toString()+(b>=0?"+":"")+(b==1?"":b.toString())+"i)-"+"("+c.toString()+(d>=0?"+":"")+d.toString()+"i)";
+      let realpart = a-c;
+      let imagpart = b-d;
+      if (realpart == 0) {
+        answer = imagpart.toString()+"i";
+      } else if (imagpart == 0) {
+        answer = realpart.toString();
+      } else {
+        answer = realpart.toString()+(imagpart>0?"+":"")+imagpart.toString()+"i";
+      }
+      console.log(answer);
+    } else if (type == 'complex mult') {
+      let a=0;
+      let b=0;
+      let c=0;
+      let d=0;
+      while(a*b*c*d==0) {
+        a = randomInt(-(level+3), level+3);
+        b = randomInt(-(level+3), level+3);
+        c = randomInt(-(level+3), level+3);
+        d = randomInt(-(level+3), level+3);
+      }
+      question = "("+a.toString()+(b>=0?"+":"")+(b==1?"":b.toString())+"i)*"+"("+c.toString()+(d>=0?"+":"")+d.toString()+"i)";
+      console.log(a, b, c, d)
+      let realpart = a*c-b*d;
+      let imagpart = a*d+b*c;
+      if (realpart == 0) {
+        answer = imagpart.toString()+"i";
+      } else if (imagpart == 0) {
+        answer = realpart.toString();
+      } else {
+        answer = realpart.toString()+(imagpart>0?"+":"")+imagpart.toString()+"i";
+      }
+      console.log(answer);
+    } else if (type == "factor a=1") {
+      let a = 0;
+      let b = 0;
+      while(a*b==0) {
+        a = randomInt(-(level+3), level+3);
+        b = randomInt(-(level+3), level+3);
+      }
+      let x = a+b;
+      let unit = a*b;
+      question = "Factor x^2"
     }
     return {'question': question, 'answer': answer}
   }
 
   keyHandler = (e) => {
-    console.log(e);
     if (e.nativeEvent.key === 'Enter') {
       this.submitGuess();
     }
     if (e.nativeEvent.key === 'Backspace') {
       this.changeGuess(this.state.guess.slice(0, -1));
     }
-    if ('.0123456789'.includes(e.nativeEvent.key)) {
+    if ('.0123456789-+i'.includes(e.nativeEvent.key)) {
       this.changeGuess(this.state.guess + e.nativeEvent.key);
     }
   };
