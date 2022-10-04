@@ -235,6 +235,9 @@ class Question extends Component {
       let unit = a*b;
       question = "Factor x^2"
     }
+    if (question == 0) {
+      return this.generate(level, options, modifiers);
+    }
     return {'question': question, 'answer': answer}
   }
 
